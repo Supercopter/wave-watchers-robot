@@ -1,0 +1,31 @@
+application: wave-watchers
+version: newversion15
+runtime: python
+api_version: 1
+
+handlers:
+- url: /_wave/.*
+  script: wavewatchers_default.py
+  
+- url: /assets
+  static_dir: assets
+    
+- url: /register
+  script: register.py
+  secure: always
+
+- url: /registerTrans
+  script: register_trans.py
+  secure: always 
+
+- url: /url
+  script: auth_setup.py
+      
+- url: /view/code/*
+  script: wavewatchers_default.py
+
+- url: /view/list/*
+  script: wavewatchers_list.py
+  
+- url: /*
+  script: do_nothing.py
