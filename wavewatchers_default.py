@@ -360,7 +360,7 @@ def OnGadgetStateChanged(event, wavelet):
 
 if __name__ == '__main__':
   myRobot = robot.Robot("WaveWatchers' Bot", 
-  image_url='http://natabbottsxmlstore.webs.com/Other-wave/Wave-Watchers_Robot-Avatar.jpg',
+  image_url='http://wave-watchers.appspot.com/Wave-Watchers.png',
   profile_url='http://groups.google.com/group/wave-watchers')
   import verify
   myRobot.setup_oauth(verify.consumerKey, verify.consumerSecret, server_rpc_base='http://gmodules.com/api/rpc')
