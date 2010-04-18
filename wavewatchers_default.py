@@ -19,34 +19,33 @@ SHORT_PRIMARY_INDEX_ID = 'googlewave.com!w+EXoDbYjDH'
 SHORT_SECONDARY_INDEX_ID = 'googlewave.com!w+EXoDbYjDJ'
 
 def displayCommands(wavelet):
-  a = "\n\nList of commands:\n"
-  b = "addAll"
-  c = " - adds all the wavewatchers*\n"
-  d = "updateIndex"
-  e = " - re-posts a link to the index wave\n"
-  f = "isSafe"
-  g = " - displays info about the publicity & participants of a wave\n"
-  h = "makePublic"
-  i = " - adds the wave-watchers group & public to the wave\n"
-  j = "displayCommands"
-  k = " - displays this help message\n"
-  l = "publishWave"
-  m = " - combines addAll and updateIndex. Used when creating a WW wave.\n"
-  n = "\n*Can only be used by a wave-watcher."
-  start_1 = len(a)
-  #Ooh. Pretty Alignment
-  end_1 = start_1 + len(b)
-  start_2 = end_1 + len(c)
-  end_2 = start_2 + len(d)
-  start_3 = end_2 + len(e)
-  end_3 = start_3 + len(f)
-  start_4 = end_3 + len(g)
-  end_4 = start_4 + len(h)
-  start_5 = end_4 + len(i)
-  end_5 = start_5 + len(j)
-  start_6 = end_5 + len(k)
-  end_6 = start_6 + len(l)
-  blip = wavelet.reply(a + b + c + d + e + f + g + h + i + j + k + l + m + n)
+  """displayCommands(wavelet):
+    Adds the full list of commands in a reply to wavelet"""
+  #variable cmds lists all the commands & their descriptions in different list elements
+  cmds = ["\n\nList of commands:\n", "addAll", " - adds all the wavewatchers.*\n", "updateIndex", " - re-posts a link to the index wave.\n",
+          "isSafe", " - displays info about the publicity & participants of a wave.\n", "makePublic", " - adds the wave-watchers group & \
+public to the wave.\n", "displayCommands", " - displays this help message.\n", "publishWave", " - combines addAll and updateIndex. Used when\
+ creating a WW wave.\n", "\n*Can only be used by a wave-watcher."]
+  #The following lines set up helpful variables giving lengths of the different commands and decriptions
+  start_1 = len(cmds[0])
+  end_1 = start_1 + len(cmds[1])
+  start_2 = end_1 + len(cmds[2])
+  end_2 = start_2 + len(cmds[3])
+  start_3 = end_2 + len(cmds[4])
+  end_3 = start_3 + len(cmds[5])
+  start_4 = end_3 + len(cmds[6])
+  end_4 = start_4 + len(cmds[7])
+  start_5 = end_4 + len(cmds[8])
+  end_5 = start_5 + len(cmds[9])
+  start_6 = end_5 + len(cmds[10])
+  end_6 = start_6 + len(cmds[11])
+  all = ''
+  #The for loop here combines all commands stored under cmds into one string all
+  for i in cmds:
+    all += i
+  #replies to wavelet with all
+  blip = wavelet.reply(all)
+  #Annotates as bold the commands using len()s stored above
   blip.range(start_1, end_1).annotate("style/fontWeight", "bold")
   blip.range(start_2, end_2).annotate("style/fontWeight", "bold")
   blip.range(start_3, end_3).annotate("style/fontWeight", "bold")
@@ -54,19 +53,22 @@ def displayCommands(wavelet):
   blip.range(start_5, end_5).annotate("style/fontWeight", "bold")
   blip.range(start_6, end_6).annotate("style/fontWeight", "bold")
   blip.range(0, len(a)).annotate("style/fontWeight", "bold")
+  #Increases font size of cmds[0]
   blip.range(0, len(a)).annotate('style/fontSize', '1.75em')
 
 def addWavewatchers(event, wavelet, addAll = False):
-  logging.info("addWavewatchers called. Modified by: " + event.modified_by)
-  opQueue = wavelet.get_operation_queue()
-  wave_id = wavelet.wave_id
-  wavelet_id = wavelet.wavelet_id
-  opQueue.wavelet_add_participant(wavelet.wave_id, wavelet.wavelet_id, "wave-watchers@googlegroups.com")
-  opQueue.wavelet_add_participant(wavelet.wave_id, wavelet.wavelet_id, "nat.abbotts@googlewave.com")
-  if event.modified_by not in wavewatchers_list.safe:
-    wavelet.reply("Wavewatchers Team Notified")
-    return True
-  if addAll:
+  """addWavewatchers(event, wavelet, [addAll = False]"""
+  #Addall function
+  logging.info("addWavewatchers called. Modified by: " + event.modified_by)   #Sends the name of the person calling the commands to the logs
+  opQueue = wavelet.get_operation_queue() #Gets the operation queue (see ops module)
+  wave_id = wavelet.wave_id #Gets the wave_id of the wave, for use by the ops module
+  wavelet_id = wavelet.wavelet_id # Gets wavelet_id of wave, for use by ops module
+  opQueue.wavelet_add_participant(wavelet.wave_id, wavelet.wavelet_id, "wave-watchers@googlegroups.com") #Adds the group as a participant on the wave.
+  opQueue.wavelet_add_participant(wavelet.wave_id, wavelet.wavelet_id, "nat.abbotts@googlewave.com") #Adds me as a participant on the wave (I want to be notified of everything now) :]
+  if event.modified_by not in wavewatchers_list.safe: #If the active user is not a wave-watcher/on the safe list...
+    wavelet.reply("Wavewatchers Team Notified") #Tell them that the wave-watchers have been notified
+    return True #End the addAll function, return to whatever called it
+  if addAll: #If the variable addAll was provided and is true...
     logging.info("addAll Called")
     change = None
     for participant in wavewatchers_list.waveWatchers:
@@ -110,8 +112,7 @@ def checkBadParticipants(event, wavelet):
 def checkRobots(event, wavelet):
   robotParticipants = []
   for participant in wavelet.participants:
-    participantSplit = participant.split("@")
-    if participantSplit[1] == "appspot.com":
+    if participant.split("@")[1] == "appspot.com":
       robotParticipants.append(participant)
   intro_str = "\nRobots that are participants: "
   robots_str = ''
@@ -124,31 +125,26 @@ def checkRobots(event, wavelet):
   
 def updateIndex(event, wavelet, state = False):
   global myRobot
-  content_1 = "\n\n\n\nTitle: "
+  content = ["\n\n\n\nTitle: ",]
   if wavelet.title:
-    content_2 = wavelet.title
+    content[1] = wavelet.title
   else:
-    content_2 = "(untitled wave)"
-  content_3 = "\nIndexed By: "
-  content_4 = event.modified_by
-  content_5 = "\nWave ID: "
-  content_6 = wavelet.wave_id
-  content_7 = "\nWave was created by: "
-  content_8 = wavelet.creator
-  content_9, content_10 = checkBadParticipants(event, wavelet)
-  content_11, content_12 = checkRobots(event, wavelet)
+    content[1] = "(untitled wave)"
+  content += ["\nIndexed By: ", event.modified_by, "\nWave ID: ", wavelet.wave_id, "\nWave was created by: ", wavelet.creator, None, None, None, None]
+  content[8], content[9] = checkBadParticipants(event, wavelet)
+  content[10], content[11] = checkRobots(event, wavelet)
   lastline = 0
   if "public@a.gwave.com" in wavelet.participants:
-    content_13 = "\nThe wave is public."
+    content.append("\nThe wave is public.")
     lastline = 1
   elif "wave-watchers@googlegroups.com" in wavelet.participants:
-    content_13 = "\nThe wave is not public, but viewable by a wave-watcher."
+    content.append("\nThe wave is not public, but viewable by a wave-watcher.")
     lastline = 2
   elif state:
-    content_13 = "\nThe wave is not public, but viewable by a wave-watcher."
+    content.append("\nThe wave is not public, but viewable by a wave-watcher.")
     lastline = 2
   else:
-    content_13 = "\nThe wave is not public, and wave-watchers were added individually."
+    content.append("\nThe wave is not public, and wave-watchers were added individually.")
     lastline = 3
   titleLength = len(wavelet.title)
   start_1 = 0
@@ -311,7 +307,7 @@ def OnBlipSubmitted(event, wavelet):
     if "chuckNorris(" in event.blip.text:
       text = event.blip.text.split("chuckNorris(")[1]
       text = text.split(")")
-      chuckNorris = myRobot.new_wave(wavelet.domain, participants = ["wave-watchers@googlegroups.com", event.modified_by, text[0]], message = text[0], submit = True)
+      chuckNorris = myRobot.new_wave(wavelet.domain, participants = ["wave-watchers@googlegroups.com", event.modified_by, text[0]], submit = True)
       chuckNorrisIndex = myRobot.fetch_wavelet('googlewave.com!w+mTNnWQtAx', WAVELET_ID)
       blip = chuckNorrisIndex.reply("\n" + text[0] + " ")
       blip.range(0, len("\n" + text[0])).annotate("link/wave", chuckNorris.wave_id)
