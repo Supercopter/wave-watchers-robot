@@ -26,6 +26,10 @@ handlers:
 
 - url: /view/list/*
   script: wavewatchers_list.py
+
+- url: /(.*\.(gif|png|jpg))
+  static_files: static/\1
+  upload: static/(.*\.(gif|png|jpg))
   
 - url: /*
   script: do_nothing.py
