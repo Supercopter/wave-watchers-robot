@@ -313,7 +313,7 @@ def OnBlipSubmitted(event, wavelet):
       blip.range(0, len("\n" + text[0])).annotate("link/wave", chuckNorris.wave_id)
       chuckNorrisOpQ = chuckNorris.get_operation_queue()
       chuckNorrisOpQ.wavelet_set_title(chuckNorris.wave_id, chuckNorris.wavelet_id, "Chuck Norris just kicked " + text[0] + " troll ASS!")
-      wavelet.reply("\nOoooh! " + event.message + " just got Chuck Norris'ed!")	  
+      wavelet.reply("\nOoooh! " + text[0] + " just got Chuck Norris'ed!")	  
     else:
       chuckNorris = myRobot.new_wave(wavelet.domain, participants = ["wave-watchers@googlegroups.com", event.modified_by], message = '', submit = True)
       chuckNorrisIndex = myRobot.fetch_wavelet('googlewave.com!w+mTNnWQtAx', WAVELET_ID)
