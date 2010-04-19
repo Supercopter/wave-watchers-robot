@@ -127,9 +127,9 @@ def updateIndex(event, wavelet, state = False):
   global myRobot
   content = ["\n\n\n\nTitle: ",]
   if wavelet.title:
-    content[1] = wavelet.title
+    content.append(wavelet.title)
   else:
-    content[1] = "(untitled wave)"
+    content.append("(untitled wave)")
   content += ["\nIndexed By: ", event.modified_by, "\nWave ID: ", wavelet.wave_id, "\nWave was created by: ", wavelet.creator, None, None, None, None]
   content[8], content[9] = checkBadParticipants(event, wavelet)
   content[10], content[11] = checkRobots(event, wavelet)
