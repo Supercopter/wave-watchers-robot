@@ -149,23 +149,25 @@ def updateIndex(event, wavelet, state = False):
   titleLength = len(wavelet.title)
   start_1 = 0
   #Oooh. Pretty alignment...
-  end_1 = start_1 + len(content_1)
-  start_2 = end_1 + len(content_2)
-  end_2 = start_2 + len(content_3)
-  start_3 = end_2 + len(content_4)
-  end_3 = start_3 + len(content_5)
-  start_4 = end_3 + len(content_6)
-  end_4 = start_4 + len(content_7)
-  start_5 = end_4 + len(content_8)
-  end_5 = start_5 + len(content_9)
-  start_6 = end_5 + len(content_10)
-  end_6 = start_6 + len(content_11)
-  start_7 = end_6 + len(content_12)
-  end_7 = start_7 + len(content_13)
-  content = content_1 + content_2 + content_3 + content_4 + content_5 + content_6 + content_7 + content_8 + content_9 + content_10 + content_11 + content_12 + content_13
+  end_1 = start_1 + len(content[0])
+  start_2 = end_1 + len(content[1])
+  end_2 = start_2 + len(content[2])
+  start_3 = end_2 + len(content[3])
+  end_3 = start_3 + len(content[4])
+  start_4 = end_3 + len(content[5])
+  end_4 = start_4 + len(content[6])
+  start_5 = end_4 + len(content[7])
+  end_5 = start_5 + len(content[8])
+  start_6 = end_5 + len(content[9])
+  end_6 = start_6 + len(content[10])
+  start_7 = end_6 + len(content[11])
+  end_7 = start_7 + len(content[12])
+  text = ''
+  for i in content:
+    text += i
   if event.modified_by in wavewatchers_list.safe:
     indexWave = myRobot.fetch_wavelet(INDEX_WAVE_ID, WAVELET_ID)
-    blip = indexWave.reply(content)
+    blip = indexWave.reply(text)
     blip.range(start_1, end_1).annotate("style/fontWeight", "bold")
     blip.range(start_2, end_2).annotate("style/fontWeight", "bold")
     blip.range(start_3, end_3).annotate("style/fontWeight", "bold")
@@ -199,7 +201,7 @@ def updateIndex(event, wavelet, state = False):
     myRobot.submit(shortIndexWave)	
   else:
     secondaryIndexWave = myRobot.fetch_wavelet(SECONDARY_INDEX_ID, WAVELET_ID)
-    blip = secondaryIndexWave.reply(content)
+    blip = secondaryIndexWave.reply(text)
     blip.range(start_1, end_1).annotate("style/fontWeight", "bold")
     blip.range(start_2, end_2).annotate("style/fontWeight", "bold")
     blip.range(start_3, end_3).annotate("style/fontWeight", "bold")
@@ -229,7 +231,9 @@ def updateIndex(event, wavelet, state = False):
     firstAppend = wavelet.title + " "
     rootBlip.append(firstAppend)
     rootBlip.range(lenBeforeEdit, lenBeforeEdit + len(firstAppend)).annotate("link/wave", wavelet.wave_id)
-    myRobot.submit(shortIndexWave)		
+    myRobot.submit(shortIndexWave)
+    logging.debug(text)
+    logging.info("updateIndex func Completed")
 	  
 	  
 def BlockTroll(event, wavelet):
