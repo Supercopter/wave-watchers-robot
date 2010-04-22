@@ -1,5 +1,5 @@
 application: wave-watchers
-version: newversion19
+version: 20
 runtime: python
 api_version: 1
 
@@ -9,6 +9,10 @@ handlers:
   
 - url: /assets
   static_dir: assets
+  
+- url: /(.*\.(gif|png|jpg))
+  static_files: assets/\1
+  upload: assets/(.*\.(gif|png|jpg))
     
 - url: /register
   script: register.py
@@ -26,10 +30,6 @@ handlers:
 
 - url: /view/list/*
   script: wavewatchers_list.py
-
-- url: /(.*\.(gif|png|jpg))
-  static_files: assets/\1
-  upload: assets/(.*\.(gif|png|jpg))
   
 - url: /*
   script: do_nothing.py

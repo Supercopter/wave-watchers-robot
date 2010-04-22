@@ -52,9 +52,9 @@ public to the wave.\n", "displayCommands", " - displays this help message.\n", "
   blip.range(start_4, end_4).annotate("style/fontWeight", "bold")
   blip.range(start_5, end_5).annotate("style/fontWeight", "bold")
   blip.range(start_6, end_6).annotate("style/fontWeight", "bold")
-  blip.range(0, len(a)).annotate("style/fontWeight", "bold")
+  blip.range(0, len(cmds[0]) - 1).annotate("style/fontWeight", "bold")
   #Increases font size of cmds[0]
-  blip.range(0, len(a)).annotate('style/fontSize', '1.75em')
+  blip.range(0, len(cmds[0]) - 1).annotate('style/fontSize', '1.75em')
 
 def addWavewatchers(event, wavelet, addAll = False):
   """addWavewatchers(event, wavelet, [addAll = False]"""
@@ -253,84 +253,86 @@ def OnWaveletSelfAdded(event, wavelet):
   
 def OnBlipSubmitted(event, wavelet):
   logging.info("OnBlipSubmitted Called")
-  logging.info("Blip text = " + event.blip.text)
+  if event.blip.text:
+    logging.info("Blip text = " + event.blip.text)
   logging.info("WaveID = " + wavelet.wave_id)
   logging.info("WaveletID = " + wavelet.wavelet_id)
   logging.info("Blip ID = " + event.blip_id)
   logging.info(event.blip.annotations.serialize())
   opQueue = wavelet.get_operation_queue()
-  if "makePublic" in event.blip.text:
-    logging.info("makePublic Found")
-    opQueue.wavelet_add_participant(wavelet.wave_id, wavelet.wavelet_id, "wave-watchers@googlegroups.com")
-    opQueue.wavelet_add_participant(wavelet.wave_id, wavelet.wavelet_id, "public@a.gwave.com")
-    wavelet.reply("\nMake sure that public is set as read-only!")
-    logging.info("makePublic Completed")
-  if "addAll" in event.blip.text:
-    logging.info("addAll Found")
-    addWavewatchers(event, wavelet, addAll = True)
-    logging.info("addAll Completed")
-  if "isSafe" in event.blip.text:
-    logging.info("isSafe Found")
-    isUnsafe = None
-    nonWW = []
-    for participant in wavelet.participants:
-      if participant not in wavewatchers_list.safe:
-		isUnsafe = True
-		nonWW.append(participant)
-    if not isUnsafe:
-      wavelet.reply("\nOnly Wave Watchers can view this wave.")
-    elif "public@a.gwave.com" in wavelet.participants:
-      wavelet.reply("\nAll Wave users can view this wave.")
-    else:
-	  content = "\nSome Participants are not wave-watchers. Those are:\n"
-	  for participant in nonWW:
-		content += participant + " ,\n"
-	  wavelet.reply(content)
-    logging.info("isSafe Completed")
-  if "updateIndex" in event.blip.text:
-    logging.info("updateIndex Found")
-    updateIndex(event, wavelet)
-    logging.info("updateIndex Completed")
-  if "displayCommands" in event.blip.text:
-    logging.info("displayCommands Found")
-    displayCommands(wavelet)
-    logging.info("displayCommands Completed")
-  if "publishWave" in event.blip.text:
-    logging.info("publishWave Found")
-    updateIndex(event, wavelet, state = False)
-    state = addWavewatchers(event, wavelet, addAll = False)
-    logging.info("publishWave Completed")
-	#
-	#
-	#
-  if "chuckNorris" in event.blip.text:
-    if event.modified_by not in wavewatchers_list.safe:
-	  logging.info("OnBlipSubmitted Completed")
-	  return
-    global myRobot
-    if "chuckNorris(" in event.blip.text:
-      text = event.blip.text.split("chuckNorris(")[1]
-      text = text.split(")")
-      chuckNorris = myRobot.new_wave(wavelet.domain, participants = ["wave-watchers@googlegroups.com", event.modified_by, text[0]], submit = True)
-      chuckNorrisIndex = myRobot.fetch_wavelet('googlewave.com!w+mTNnWQtAx', WAVELET_ID)
-      blip = chuckNorrisIndex.reply("\n" + text[0] + " ")
-      blip.range(0, len("\n" + text[0])).annotate("link/wave", chuckNorris.wave_id)
-      chuckNorrisOpQ = chuckNorris.get_operation_queue()
-      chuckNorrisOpQ.wavelet_set_title(chuckNorris.wave_id, chuckNorris.wavelet_id, "Chuck Norris just kicked " + text[0] + " troll ASS!")
-      reply = wavelet.reply("\nOoooh! " + text[0] + " just got Chuck Norris'ed!")	  
-    else:
-      chuckNorris = myRobot.new_wave(wavelet.domain, participants = ["wave-watchers@googlegroups.com", event.modified_by], message = '', submit = True)
-      chuckNorrisIndex = myRobot.fetch_wavelet('googlewave.com!w+mTNnWQtAx', WAVELET_ID)
-      blip = chuckNorrisIndex.reply("\nA Troll Got Chuck Norris'ed " )
-      blip.range(0, len("\nA Troll Got Chuck Norris'ed")).annotate("link/wave", chuckNorris.wave_id)
-      chuckNorrisOpQ = chuckNorris.get_operation_queue()
-      chuckNorrisOpQ.wavelet_set_title(chuckNorris.wave_id, chuckNorris.wavelet_id, "Chuck Norris just kicked a troll's ASS!")
-      reply = wavelet.reply("\nOoooh! A troll just got Chuck Norris'ed!")
-    reply.range(0, 7).annotate("link/wave", chuckNorris.wave_id)
-    #wavelet.root_blip.append(element.Image(url = 'http://lh4.ggpht.com/_21nXtfYRLLQ/S8TWNljJD3I/AAAAAAAABqk/KbMTcXE27GA/chuckwave.png',caption = 'Your  conquerer'))
-    chuckNorris.root_blip.append(element.Image(url = 'http://lh4.ggpht.com/_21nXtfYRLLQ/S8TWNljJD3I/AAAAAAAABqk/KbMTcXE27GA/chuckwave.png',caption = 'Your  conquerer'))
-    myRobot.submit(chuckNorrisIndex)
-    myRobot.submit(chuckNorris)
+  if event.blip.text:
+    if "makePublic" in event.blip.text:
+      logging.info("makePublic Found")
+      opQueue.wavelet_add_participant(wavelet.wave_id, wavelet.wavelet_id, "wave-watchers@googlegroups.com")
+      opQueue.wavelet_add_participant(wavelet.wave_id, wavelet.wavelet_id, "public@a.gwave.com")
+      wavelet.reply("\nMake sure that public is set as read-only!")
+      logging.info("makePublic Completed")
+    if "addAll" in event.blip.text:
+      logging.info("addAll Found")
+      addWavewatchers(event, wavelet, addAll = True)
+      logging.info("addAll Completed")
+    if "isSafe" in event.blip.text:
+      logging.info("isSafe Found")
+      isUnsafe = None
+      nonWW = []
+      for participant in wavelet.participants:
+        if participant not in wavewatchers_list.safe:
+          isUnsafe = True
+          nonWW.append(participant)
+      if not isUnsafe:
+        wavelet.reply("\nOnly Wave Watchers can view this wave.")
+      elif "public@a.gwave.com" in wavelet.participants:
+        wavelet.reply("\nAll Wave users can view this wave.")
+      else:
+        content = "\nSome Participants are not wave-watchers. Those are:\n"
+        for participant in nonWW:
+          content += participant + " ,\n"
+        wavelet.reply(content)
+      logging.info("isSafe Completed")
+    if "updateIndex" in event.blip.text:
+      logging.info("updateIndex Found")
+      updateIndex(event, wavelet)
+      logging.info("updateIndex Completed")
+    if "displayCommands" in event.blip.text:
+      logging.info("displayCommands Found")
+      displayCommands(wavelet)
+      logging.info("displayCommands Completed")
+    if "publishWave" in event.blip.text:
+      logging.info("publishWave Found")
+      updateIndex(event, wavelet, state = False)
+      state = addWavewatchers(event, wavelet, addAll = False)
+      logging.info("publishWave Completed")
+          #
+          #
+          #
+    if "chuckNorris" in event.blip.text:
+      if event.modified_by not in wavewatchers_list.safe:
+          logging.info("OnBlipSubmitted Completed")
+          return
+      global myRobot
+      if "chuckNorris(" in event.blip.text:
+        text = event.blip.text.split("chuckNorris(")[1]
+        text = text.split(")")
+        chuckNorris = myRobot.new_wave(wavelet.domain, participants = ["wave-watchers@googlegroups.com", event.modified_by, text[0]], submit = True)
+        chuckNorrisIndex = myRobot.fetch_wavelet('googlewave.com!w+mTNnWQtAx', WAVELET_ID)
+        blip = chuckNorrisIndex.reply("\n" + text[0] + " ")
+        blip.range(0, len("\n" + text[0])).annotate("link/wave", chuckNorris.wave_id)
+        chuckNorrisOpQ = chuckNorris.get_operation_queue()
+        chuckNorrisOpQ.wavelet_set_title(chuckNorris.wave_id, chuckNorris.wavelet_id, "Chuck Norris just kicked " + text[0] + " troll ASS!")
+        reply = wavelet.reply("\nOoooh! " + text[0] + " just got Chuck Norris'ed!")	  
+      else:
+        chuckNorris = myRobot.new_wave(wavelet.domain, participants = ["wave-watchers@googlegroups.com", event.modified_by], message = '', submit = True)
+        chuckNorrisIndex = myRobot.fetch_wavelet('googlewave.com!w+mTNnWQtAx', WAVELET_ID)
+        blip = chuckNorrisIndex.reply("\nA Troll Got Chuck Norris'ed " )
+        blip.range(0, len("\nA Troll Got Chuck Norris'ed")).annotate("link/wave", chuckNorris.wave_id)
+        chuckNorrisOpQ = chuckNorris.get_operation_queue()
+        chuckNorrisOpQ.wavelet_set_title(chuckNorris.wave_id, chuckNorris.wavelet_id, "Chuck Norris just kicked a troll's ASS!")
+        reply = wavelet.reply("\nOoooh! A troll just got Chuck Norris'ed!")
+      reply.range(0, 7).annotate("link/wave", chuckNorris.wave_id)
+      #wavelet.root_blip.append(element.Image(url = 'http://lh4.ggpht.com/_21nXtfYRLLQ/S8TWNljJD3I/AAAAAAAABqk/KbMTcXE27GA/chuckwave.png',caption = 'Your  conquerer'))
+      chuckNorris.root_blip.append(element.Image(url = 'http://lh4.ggpht.com/_21nXtfYRLLQ/S8TWNljJD3I/AAAAAAAABqk/KbMTcXE27GA/chuckwave.png',caption = 'Your  conquerer'))
+      myRobot.submit(chuckNorrisIndex)
+      myRobot.submit(chuckNorris)
   logging.info("OnBlipSubmitted Completed")
   
 def OnWaveletCreated(event, wavelet):
@@ -365,10 +367,10 @@ if __name__ == '__main__':
   image_url='http://wave-watchers.appspot.com/Wave-Watchers.png',
   profile_url='http://groups.google.com/group/wave-watchers')
   import verify
-  myRobot.setup_oauth(verify.consumerKey, verify.consumerSecret, server_rpc_base='http://gmodules.com/api/rpc')
   myRobot.register_handler(events.WaveletSelfAdded, OnWaveletSelfAdded)
-  myRobot.register_handler(events.BlipSubmitted, OnBlipSubmitted)
   myRobot.register_handler(events.WaveletTitleChanged, OnWaveletTitleChanged)
   myRobot.register_handler(events.GadgetStateChanged, OnGadgetStateChanged)
   myRobot.register_handler(events.WaveletCreated, OnWaveletCreated)
+  myRobot.register_handler(events.BlipSubmitted, OnBlipSubmitted)
+  myRobot.setup_oauth(verify.consumerKey, verify.consumerSecret, server_rpc_base='http://gmodules.com/api/rpc')
   appengine_robot_runner.run(myRobot)
