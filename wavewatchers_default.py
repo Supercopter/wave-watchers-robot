@@ -10,9 +10,9 @@ import wavewatchers_list
 #import testing
 #import hashlib
 #from google.appengine.api import mail
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.ext import db
+#from google.appengine.ext import webapp
+#from google.appengine.ext.webapp.util import run_wsgi_app
+#from google.appengine.ext import db
 INDEX_WAVE_ID = 'googlewave.com!w+JOQvIuevS'
 WAVELET_ID = 'googlewave.com!conv+root'
 SECONDARY_INDEX_ID = 'googlewave.com!w+2DFkTj9KC'
@@ -96,7 +96,7 @@ def tagWavelet(event, wavelet):
   if "wave-watchers" not in current_tags:
     opQueue.wavelet_modify_tag(wave_id, wavelet_id, "wave-watchers") #tags with second tag
   logging.info("TagWavelet Completed")
-	
+  
 def checkBadParticipants(event, wavelet):
   """checkBadParticipants(event, wavelet) checks for people in the black/grey list. Returns 2 args"""
   logging.info("checkBadParticipants Called")
@@ -112,7 +112,7 @@ def checkBadParticipants(event, wavelet):
       bad_p_str += villain + ", "
   logging.info("checkBadParticipants Completed")
   return intro_str, bad_p_str
-	  
+    
 def checkRobots(event, wavelet):
   """checkRobots(event, wavelet) checks for robots. Returns 2 args"""
   robotParticipants = []
@@ -201,7 +201,7 @@ def updateIndex(event, wavelet, state = False):
     rootBlip.append(firstAppend)
     rootBlip.range(lenBeforeEdit, lenBeforeEdit + len(firstAppend)).annotate("link/wave", wavelet.wave_id)
     line2 = element.Line(line_type='li', indent = 1)
-    myRobot.submit(shortIndexWave)	
+    myRobot.submit(shortIndexWave)  
   else:
     secondaryIndexWave = myRobot.fetch_wavelet(SECONDARY_INDEX_ID, WAVELET_ID)
     blip = secondaryIndexWave.reply(text)
@@ -237,10 +237,10 @@ def updateIndex(event, wavelet, state = False):
     myRobot.submit(shortIndexWave)
     logging.debug(text)
     logging.info("updateIndex func Completed")
-	    
+      
 def BlockTroll(event, wavelet):
   logging.debug("BlockTroll Called")
-	  
+    
 def OnWaveletSelfAdded(event, wavelet):
   logging.info("OnWaveletSelfAdded called")
   tagWavelet(event, wavelet)
@@ -301,7 +301,7 @@ def OnBlipSubmitted(event, wavelet):
     if "publishWave" in event.blip.text:
       logging.info("publishWave Found")
       state = addWavewatchers(event, wavelet)
-      updateIndex(event, wavelet, state
+      updateIndex(event, wavelet, state)
       logging.info("publishWave Completed")
     if "chuckNorris" in event.blip.text:
       if event.modified_by not in wavewatchers_list.safe:
@@ -317,7 +317,7 @@ def OnBlipSubmitted(event, wavelet):
         blip.range(0, len("\n" + text[0])).annotate("link/wave", chuckNorris.wave_id)
         chuckNorrisOpQ = chuckNorris.get_operation_queue()
         chuckNorrisOpQ.wavelet_set_title(chuckNorris.wave_id, chuckNorris.wavelet_id, "Chuck Norris just kicked " + text[0] + " troll ASS!")
-        reply = wavelet.reply("\nOoooh! " + text[0] + " just got Chuck Norris'ed!")	  
+        reply = wavelet.reply("\nOoooh! " + text[0] + " just got Chuck Norris'ed!")   
       else:
         chuckNorris = myRobot.new_wave(wavelet.domain, participants = ["wave-watchers@googlegroups.com", event.modified_by], message = '', submit = True)
         chuckNorrisIndex = myRobot.fetch_wavelet('googlewave.com!w+mTNnWQtAx', WAVELET_ID)
@@ -350,8 +350,8 @@ def OnGadgetStateChanged(event, wavelet):
   for pos in range(len(event.blip.elements)):
     logging.info(event.blip.elements[pos])
     if "waveapi.element.Gadget" in str(event.blip.elements[pos]):
-	  pos2 = pos
-	  break
+      pos2 = pos
+      break
   gad = event.blip.elements[pos]
   if gad is not None and gad.get('url')=='http://everybodywave.appspot.com/gadget/alerter/gad.xml': 
     alert_text = alerts[int(gad.get('level'))]
