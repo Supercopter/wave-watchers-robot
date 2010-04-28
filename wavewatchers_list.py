@@ -1,7 +1,6 @@
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
-import cgi
 
 waveWatchers = ['albonobo@googlewave.com',
 				'jeremy.ngl@googlewave.com',
@@ -61,9 +60,9 @@ bad = (	'bononcinid@googlewave.com',
 		'niefuend@googlewave.com',
 		'taschentuchb@googlewave.com',
 		'misamisala@googlewave.com',
-		'',
-		'',
-		'',
+		'newnar2010@googlewave.com',
+		'mahfuzatiku@googlewave.com',
+		'kenna180@googlewave.com',
 		'',
 		'',
 		'greylist:',

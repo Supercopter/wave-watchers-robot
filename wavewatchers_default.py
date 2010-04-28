@@ -6,9 +6,10 @@ from waveapi import element
 from waveapi import wavelet
 import logging
 import wavewatchers_list
-import cgi
-import hashlib
-from google.appengine.api import mail
+#import cgi
+#import testing
+#import hashlib
+#from google.appengine.api import mail
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
@@ -21,6 +22,7 @@ SHORT_SECONDARY_INDEX_ID = 'googlewave.com!w+EXoDbYjDJ'
 def displayCommands(wavelet):
   """displayCommands(wavelet):
     Adds the full list of commands in a reply to wavelet"""
+  logging.info("displayCommands Called")
   #variable cmds lists all the commands & their descriptions in different list elements
   cmds = ["\n\nList of commands:\n", "addAll", " - adds all the wavewatchers.*\n", "updateIndex", " - re-posts a link to the index wave.\n",
           "isSafe", " - displays info about the publicity & participants of a wave.\n", "makePublic", " - adds the wave-watchers group & \
@@ -53,11 +55,13 @@ public to the wave.\n", "displayCommands", " - displays this help message.\n", "
   blip.range(start_5, end_5).annotate("style/fontWeight", "bold")
   blip.range(start_6, end_6).annotate("style/fontWeight", "bold")
   blip.range(0, len(cmds[0]) - 1).annotate("style/fontWeight", "bold")
-  #Increases font size of cmds[0]
+  #Increases font size of cmds[0]  
   blip.range(0, len(cmds[0]) - 1).annotate('style/fontSize', '1.75em')
+  logging.info("displayCommands completed")
 
-def addWavewatchers(event, wavelet, addAll = False):
-  """addWavewatchers(event, wavelet, [addAll = False]"""
+def addWavewatchers(event, wavelet):
+  """addWavewatchers(event, wavelet)"""
+  logging.info("addWavewatchers Called")
   #Addall function
   logging.info("addWavewatchers called. Modified by: " + event.modified_by)   #Sends the name of the person calling the commands to the logs
   opQueue = wavelet.get_operation_queue() #Gets the operation queue (see ops module)
@@ -68,35 +72,34 @@ def addWavewatchers(event, wavelet, addAll = False):
   if event.modified_by not in wavewatchers_list.safe: #If the active user is not a wave-watcher/on the safe list...
     wavelet.reply("Wavewatchers Team Notified") #Tell them that the wave-watchers have been notified
     return True #End the addAll function, return to whatever called it
-  if addAll: #If the variable addAll was provided and is true...
-    logging.info("addAll Called")
-    change = None
-    for participant in wavewatchers_list.waveWatchers:
-      if participant not in wavelet.participants:
-        opQueue.wavelet_add_participant(wave_id, wavelet_id, participant)
-        change = True
-    if change:
-      wavelet.reply("WaveWatchers Team All Added")
-    else:
-      wavelet.reply("WaveWatchers Team Already Partipants")
-  else:
-    for participant in wavewatchers_list.waveWatchers:
+  change = None #create variable 'change' to be used later.
+  for participant in wavewatchers_list.waveWatchers:
+    if participant not in wavelet.participants:
       opQueue.wavelet_add_participant(wave_id, wavelet_id, participant)
-    wavelet.reply("WaveWatchers Team Added")
+      change = True
+  if change:
+    wavelet.reply("WaveWatchers Team All Added")
+  else:
+    wavelet.reply("WaveWatchers Team Already Partipants")
+  logging.info("addWavewatchers Completed")
   return False
   
 def tagWavelet(event, wavelet):
+  """Tags the wave tagWavelet(event, wavelet)"""
   logging.info("TagWavelet Called")
-  opQueue = wavelet.get_operation_queue()
+  opQueue = wavelet.get_operation_queue() #gets operation queue
   wave_id = wavelet.wave_id
   wavelet_id = wavelet.wavelet_id
   current_tags = wavelet.tags
   if "wavewatchers" not in current_tags:
-    opQueue.wavelet_modify_tag(wave_id, wavelet_id, "wavewatchers")
+    opQueue.wavelet_modify_tag(wave_id, wavelet_id, "wavewatchers") #tags with first tag
   if "wave-watchers" not in current_tags:
-    opQueue.wavelet_modify_tag(wave_id, wavelet_id, "wave-watchers")
+    opQueue.wavelet_modify_tag(wave_id, wavelet_id, "wave-watchers") #tags with second tag
+  logging.info("TagWavelet Completed")
 	
 def checkBadParticipants(event, wavelet):
+  """checkBadParticipants(event, wavelet) checks for people in the black/grey list. Returns 2 args"""
+  logging.info("checkBadParticipants Called")
   badParticipants = []
   for participant in wavelet.participants:
     if participant in wavewatchers_list.bad:
@@ -107,9 +110,11 @@ def checkBadParticipants(event, wavelet):
     intro_str = "\nKnown Trolls/Spammers that are participants: "
     for villain in badParticipants:
       bad_p_str += villain + ", "
+  logging.info("checkBadParticipants Completed")
   return intro_str, bad_p_str
 	  
 def checkRobots(event, wavelet):
+  """checkRobots(event, wavelet) checks for robots. Returns 2 args"""
   robotParticipants = []
   for participant in wavelet.participants:
     if participant.split("@")[1] == "appspot.com":
@@ -140,12 +145,10 @@ def updateIndex(event, wavelet, state = False):
   elif "wave-watchers@googlegroups.com" in wavelet.participants:
     content.append("\nThe wave is not public, but viewable by a wave-watcher.")
     lastline = 2
-  elif state:
+  else:
     content.append("\nThe wave is not public, but viewable by a wave-watcher.")
     lastline = 2
-  else:
-    content.append("\nThe wave is not public, and wave-watchers were added individually.")
-    lastline = 3
+
   titleLength = len(wavelet.title)
   start_1 = 0
   #Oooh. Pretty alignment...
@@ -234,8 +237,7 @@ def updateIndex(event, wavelet, state = False):
     myRobot.submit(shortIndexWave)
     logging.debug(text)
     logging.info("updateIndex func Completed")
-	  
-	  
+	    
 def BlockTroll(event, wavelet):
   logging.debug("BlockTroll Called")
 	  
@@ -249,7 +251,6 @@ def OnWaveletSelfAdded(event, wavelet):
   else:
     wavelet.reply("\nType 'publishWave' in a reply to add the wave-watchers individually & submit this wave to the index.")
   displayCommands(wavelet)
-  
   
 def OnBlipSubmitted(event, wavelet):
   logging.info("OnBlipSubmitted Called")
@@ -269,7 +270,7 @@ def OnBlipSubmitted(event, wavelet):
       logging.info("makePublic Completed")
     if "addAll" in event.blip.text:
       logging.info("addAll Found")
-      addWavewatchers(event, wavelet, addAll = True)
+      addWavewatchers(event, wavelet)
       logging.info("addAll Completed")
     if "isSafe" in event.blip.text:
       logging.info("isSafe Found")
@@ -299,12 +300,9 @@ def OnBlipSubmitted(event, wavelet):
       logging.info("displayCommands Completed")
     if "publishWave" in event.blip.text:
       logging.info("publishWave Found")
-      updateIndex(event, wavelet, state = False)
-      state = addWavewatchers(event, wavelet, addAll = False)
+      state = addWavewatchers(event, wavelet)
+      updateIndex(event, wavelet, state
       logging.info("publishWave Completed")
-          #
-          #
-          #
     if "chuckNorris" in event.blip.text:
       if event.modified_by not in wavewatchers_list.safe:
           logging.info("OnBlipSubmitted Completed")
@@ -336,10 +334,10 @@ def OnBlipSubmitted(event, wavelet):
   logging.info("OnBlipSubmitted Completed")
   
 def OnWaveletCreated(event, wavelet):
-  logging.warning("OnWaveletCreated Called")
+  logging.critical("OnWaveletCreated Called") #Even after a hard-reset, I still don't get this called. Level set as CRITICAL for easy spotting.
 
 def OnWaveletTitleChanged(event, wavelet):
-  logging.warning("OnWaveletTitleChanged Called")
+  logging.critical("OnWaveletTitleChanged Called") #Even after a hard-reset, I still don't get this called. Level set as CRITICAL for easy spotting.
   updateIndex(event, wavelet)
   
 def OnGadgetStateChanged(event, wavelet):
@@ -360,7 +358,24 @@ def OnGadgetStateChanged(event, wavelet):
     new_title = "[%s] Public Waves Abuse Alert Level" % alert_text
     opQ = wavelet.get_operation_queue()
     opQ.wavelet_set_title(wavelet.wave_id, wavelet.wavelet_id, new_title)
-	
+
+def OnWaveletParticipantsChanged(event, wavelet):
+  logging.debug("OnWaveletParticipantsChanged Called")
+  opQ = wavelet.get_operation_queue() #Gets operation queue for tagging the wavelet.
+  for participant in wavelet.participants:
+    if participant not in wavewatchers_list.safe:
+        unsafe = True #Creates a variable determining if the wave is safe or not.
+  if unsafe:
+    if "not-safe" not in wavelet.tags:
+        opQ.wavelet_modify_tag(wavelet.wave_id, wavelet.wavelet_id, "not-safe") #Tags the wavelet
+    if "is-safe" in wavelet.tags:
+        opQ.wavelet_modify_tag(wavelet.wave_id, wavelet.wavelet_id, "is-safe", modify_how = "remove") #Removes a tag.
+  else:
+    if "is-safe" not in wavelet.tags:
+        opQ.wavelet_modify_tag(wavelet.wave_id, wavelet.wavelet_id, "is-safe")
+    if "not-safe" in wavelet.tags:
+        opQ.wavelet_modify_tag(wavelet.wave_id, wavelet.wavelet_id, "not-safe", modify_how = "remove")
+  logging.info("OnWaveletParticipantsChanged Completed")
 
 if __name__ == '__main__':
   myRobot = robot.Robot("WaveWatchers' Bot", 
@@ -372,5 +387,6 @@ if __name__ == '__main__':
   myRobot.register_handler(events.GadgetStateChanged, OnGadgetStateChanged)
   myRobot.register_handler(events.WaveletCreated, OnWaveletCreated)
   myRobot.register_handler(events.BlipSubmitted, OnBlipSubmitted)
+  myRobot.register_handler(events.WaveletParticipantsChanged, OnWaveletParticipantsChanged)
   myRobot.setup_oauth(verify.consumerKey, verify.consumerSecret, server_rpc_base='http://gmodules.com/api/rpc')
   appengine_robot_runner.run(myRobot)

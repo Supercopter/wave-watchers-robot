@@ -1,5 +1,5 @@
 application: wave-watchers
-version: 20
+version: 21
 runtime: python
 api_version: 1
 
@@ -24,9 +24,6 @@ handlers:
 
 - url: /url
   script: auth_setup.py
-      
-- url: /view/code/*
-  script: wavewatchers_default.py
 
 - url: /view/list/*
   script: wavewatchers_list.py
