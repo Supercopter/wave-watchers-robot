@@ -26,7 +26,11 @@ waveWatchers = ['albonobo@googlewave.com',
 				'daybead@googlewave.com',
 				'nunn.joshua@googlewave.com']
 safe = waveWatchers + [ 'pamela.fox@googlewave.com',
-						'nat.abbotts@wavesandbox.com']
+			'nat.abbotts@wavesandbox.com',
+                        'wave-watchers@appspot.com',
+                        'wave-watchers@googlegroups.com',
+                        'followapp@appspot.com',
+                        'statusee@appspot.com']
 						#'austin.chau@googlewave.com',
 						#'larster@googlewave.com',
 						#'skhannon@googlewave.com'

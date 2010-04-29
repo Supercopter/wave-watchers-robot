@@ -362,9 +362,10 @@ def OnGadgetStateChanged(event, wavelet):
 def OnWaveletParticipantsChanged(event, wavelet):
   logging.debug("OnWaveletParticipantsChanged Called")
   opQ = wavelet.get_operation_queue() #Gets operation queue for tagging the wavelet.
+  unsafe = False #Creates a variable for determining if the wave is safe or not.
   for participant in wavelet.participants:
     if participant not in wavewatchers_list.safe:
-        unsafe = True #Creates a variable determining if the wave is safe or not.
+        unsafe = True 
   if unsafe:
     if "not-safe" not in wavelet.tags:
         opQ.wavelet_modify_tag(wavelet.wave_id, wavelet.wavelet_id, "not-safe") #Tags the wavelet
