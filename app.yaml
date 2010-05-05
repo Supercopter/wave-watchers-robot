@@ -1,11 +1,16 @@
 application: wave-watchers
-version: 23
+version: 28
 runtime: python
 api_version: 1
 
 handlers:
 - url: /_wave/.*
   script: wavewatchers_default.py
+  
+- url: /setup-datastore
+  script: run_on_firstload.py
+  secure: always
+  login: admin
   
 - url: /assets
   static_dir: assets
