@@ -12,6 +12,7 @@ import logging
 #from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
 from waveapi import appengine_robot_runner
+import wavewatcher_class
 INDEX_WAVE_ID = 'googlewave.com!w+JOQvIuevS'
 WAVELET_ID = 'googlewave.com!conv+root'
 SECONDARY_INDEX_ID = 'googlewave.com!w+2DFkTj9KC'
@@ -34,12 +35,12 @@ q = db.GqlQuery('SELECT * FROM Villain WHERE level = 1')
 for i in q:
   BLACKLIST.append(i.userid)
 VILLAINS = []
-q = db.GqlQuery('SELECT * FROM Villain WHERE level = 1')
+q = db.GqlQuery('SELECT * FROM Villain')
 for i in q:
   VILLAINS.append(i.userid)
 
 def addWaveWatcher(event, wavelet, wavewatcher, level = 2):
-  logging.warning("%s is trying to add a new wavewatcher (%s) as level %s" % (modifed_by, wavewatcher, level)) #Adds a record of the attempt to the logs
+  logging.warning("%s is trying to add a new wavewatcher (%s) as level %s" % (modified_by, wavewatcher, level)) #Adds a record of the attempt to the logs
   if event.modified_by in WAVEWATCHERS_OWNERS:
     import wavewatcher_class
     rec = wavewatcher_class.WaveWatchers(userid=wavewatcher, level=level)
@@ -53,7 +54,7 @@ def addWaveWatcher(event, wavelet, wavewatcher, level = 2):
       i = "as"
     else:
       i = "as a"
-    wavelet.reply("You successfully added %s %s %s" % (wavewatcher, i, easylevels[level]))
+    wavelet.reply("%s successfully added %s %s %s" % (event.modified_by, wavewatcher, i, easylevels[level]))
     logging.warning("%s was added successfully" % wavewatcher)
   else:
     wavelet.reply("You do not have permission to perform that operation - Ask a group owner to do it for you.")
@@ -65,9 +66,9 @@ def addBadUser(event, wavelet, troll, level = 2):
     rec = wavewatcher_class.Villain(userid=troll, level=level)
     rec.put()
     if level == 1:
-      wavelet.reply("%s was successfully BLACKLISTED" % troll)
+      wavelet.reply("%s was successfully BLACKLISTED by %s" % (troll, event.modified_by))
     else:
-      wavelet.reply("%s was successfully GREYLISTED" % troll)
+      wavelet.reply("%s was successfully GREYLISTED %s" % (troll, event.modified_by))
   else:
     wavelet.reply("You do not have permission to perform that operation - Ask a group owner to do it for you.")
 
@@ -122,32 +123,34 @@ def addWavewatchers(event, wavelet, addAll = True):
   wave_id = wavelet.wave_id #Gets the wave_id of the wave, for use by the ops module
   wavelet_id = wavelet.wavelet_id # Gets wavelet_id of wave, for use by ops module
   opQueue.wavelet_add_participant(wavelet.wave_id, wavelet.wavelet_id, "nat.abbotts@googlewave.com") #Adds me as a participant on the wave (I want to be notified of everything now) :]
-  if event.modified_by not in wavewatchers_list.safe: #If the active user is not a wave-watcher/on the safe list...
+  if event.modified_by not in WAVEWATCHERS_ALL: #If the active user is not a wave-watcher/on the safe list...
     opQueue.wavelet_add_participant(wavelet.wave_id, wavelet.wavelet_id, "wave-watchers@googlegroups.com") #Adds the group as a participant on the wave.
     wavelet.reply("Wavewatchers Team Notified") #Tell them that the wave-watchers have been notified
     return True #End the addAll function, return to whatever called it
-  change = None #create variable 'change' to be used later.
+  allAdded = None #create variable 'alladded' to be used later.
+  ownersAdded = None
   results = WAVEWATCHERS_OWNERS #Queries the datastore & returns wavewatchers that are owners.
   for participant in results:
     if participant not in wavelet.participants:
       opQueue.wavelet_add_participant(wave_id, wavelet_id, participant)
-      owners = True
-  if (not addAll) and (event.modified_by not in result): 
-    results = db.GqlQuery('SELECT userid FROM WaveWatchers WHERE level = 2') #Queries the datastore & returns wavewatchers that are members.
+      ownersAdded = True
+  if (not addAll) and (event.modified_by not in results): 
+    results = WAVEWATCHERS_ALL #Queries the datastore & returns wavewatchers that are members.
     for participant in results:
       if participant not in wavelet.participants:
         opQueue.wavelet_add_participant(wave_id, wavelet_id, participant)
         allAdded = True
     opQueue.wavelet_add_participant(wavelet.wave_id, wavelet.wavelet_id, "wave-watchers@googlegroups.com") #Adds the group as a participant on the wave.
   elif addAll:
-    for participant in result:
+    results = WAVEWATCHERS_ALL
+    for participant in results:
       if participant not in wavelet.participants:
         opQueue.wavelet_add_participant(wave_id, wavelet_id, participant.userid)
         allAdded = True
     opQueue.wavelet_add_participant(wavelet.wave_id, wavelet.wavelet_id, "wave-watchers@googlegroups.com") #Adds the group as a participant on the wave.  
   if allAdded:
     wavelet.reply("WaveWatchers Team All Added")
-  elif owners:
+  elif ownersAdded:
     wavelet.reply("Owners Added")
   else:
     wavelet.reply("WaveWatchers Team Already Partipants")
@@ -342,6 +345,8 @@ def OnBlipSubmitted(event, wavelet):
   logging.info("OnBlipSubmitted Called")
   if event.blip.text:
     logging.info("Blip text = " + event.blip.text)
+  if "#!NO" in event.blip.text[:5]:
+    return
   logging.info("WaveID = " + wavelet.wave_id)
   logging.info("WaveletID = " + wavelet.wavelet_id)
   logging.info("Blip ID = " + event.blip_id)
