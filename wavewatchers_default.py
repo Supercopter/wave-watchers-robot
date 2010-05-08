@@ -7,37 +7,40 @@ import logging
 #import cgi
 #import testing
 #import hashlib
-#from google.appengine.api import mail
+from google.appengine.api import mail
 #from google.appengine.ext import webapp
 #from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
 from waveapi import appengine_robot_runner
 import wavewatcher_class
-INDEX_WAVE_ID = 'googlewave.com!w+JOQvIuevS'
+INDEX_WAVE_ID = 'googlewave.com!w+JOQvIuevS' #Here are the waveids for all of the waves that the robot updates.
 WAVELET_ID = 'googlewave.com!conv+root'
 SECONDARY_INDEX_ID = 'googlewave.com!w+2DFkTj9KC'
 SHORT_PRIMARY_INDEX_ID = 'googlewave.com!w+EXoDbYjDH'
 SHORT_SECONDARY_INDEX_ID = 'googlewave.com!w+EXoDbYjDJ'
+#The next lines create variables storing any useful searches/lists of names.
 WAVEWATCHERS_ALL = []
-q = db.GqlQuery('SELECT * FROM WaveWatchers')
+q = db.GqlQuery('SELECT * FROM WaveWatchers WHERE level = 2')
 for i in q:
   WAVEWATCHERS_ALL.append(i.userid)
 WAVEWATCHERS_OWNERS = []
 q = db.GqlQuery('SELECT * FROM WaveWatchers WHERE level = 1')
 for i in q:
   WAVEWATCHERS_OWNERS.append(i.userid)
+  WAVEWATCHERS_ALL.append(i.userid)
 GREYLIST = []
+VILLAINS = []
 q = db.GqlQuery('SELECT * FROM Villain WHERE level = 2')
 for i in q:
   GREYLIST.append(i.userid)
+  VILLAINS.append(i.userid)
 BLACKLIST = []
 q = db.GqlQuery('SELECT * FROM Villain WHERE level = 1')
 for i in q:
   BLACKLIST.append(i.userid)
-VILLAINS = []
-q = db.GqlQuery('SELECT * FROM Villain')
-for i in q:
   VILLAINS.append(i.userid)
+
+
 
 def addWaveWatcher(event, wavelet, wavewatcher, level = 2):
   logging.warning("%s is trying to add a new wavewatcher (%s) as level %s" % (modified_by, wavewatcher, level)) #Adds a record of the attempt to the logs
@@ -67,8 +70,18 @@ def addBadUser(event, wavelet, troll, level = 2):
     rec.put()
     if level == 1:
       wavelet.reply("%s was successfully BLACKLISTED by %s" % (troll, event.modified_by))
+      body = "%s successfully added %s to the wavewatchers blacklist." % (event.modified_by, troll)
+      mail.send_mail(sender="Blacklist Alerts <alerts.blacklist@wave-watchers.appspotmail.com>",
+              to=["Pooja Srinivas <poojasrinivas@gmail.com>", "Nathanael Abbotts <nat.abbotts@googlemail.com>", "wavewatchers-blacklist-alerts@googlegroups.com"],
+              subject="%s BLACKLISTED" % troll,
+              body=body)
     else:
       wavelet.reply("%s was successfully GREYLISTED %s" % (troll, event.modified_by))
+      body = "%s successfully added %s to the wavewatchers greylist." % (event.modified_by, troll)
+      mail.send_mail(sender="Greylist Alerts <alerts.greylist@wave-watchers.appspotmail.com>",
+              to=["Pooja Srinivas <poojasrinivas@gmail.com>", "Nathanael Abbotts <nat.abbotts@googlemail.com>", "wavewatchers-greylist-alerts@googlegroups.com"],
+              subject="%s GREYLISTED" % troll,
+              body=body)
   else:
     wavelet.reply("You do not have permission to perform that operation - Ask a group owner to do it for you.")
 
@@ -145,7 +158,7 @@ def addWavewatchers(event, wavelet, addAll = True):
     results = WAVEWATCHERS_ALL
     for participant in results:
       if participant not in wavelet.participants:
-        opQueue.wavelet_add_participant(wave_id, wavelet_id, participant.userid)
+        opQueue.wavelet_add_participant(wave_id, wavelet_id, participant)
         allAdded = True
     opQueue.wavelet_add_participant(wavelet.wave_id, wavelet.wavelet_id, "wave-watchers@googlegroups.com") #Adds the group as a participant on the wave.  
   if allAdded:
@@ -254,7 +267,7 @@ def updateIndex(event, wavelet, state = False):
   text = ''
   for i in content:
     text += i
-  if event.modified_by in wavewatchers_list.safe:
+  if event.modified_by in WAVEWATCHERS_ALL:
     indexWave = myRobot.fetch_wavelet(INDEX_WAVE_ID, WAVELET_ID)
     blip = indexWave.reply(text)
     blip.range(start_1, end_1).annotate("style/fontWeight", "bold")
@@ -345,7 +358,22 @@ def OnBlipSubmitted(event, wavelet):
   logging.info("OnBlipSubmitted Called")
   if event.blip.text:
     logging.info("Blip text = " + event.blip.text)
-  if "#!NO" in event.blip.text[:5]:
+  else:
+    return
+  test = False
+  commands = ["makePublic", "addAll", "addOwners", "isSafe", "updateIndex", "displayCommands", "publishWave", "chuckNorris", "addMember", "addOwner", "addRobot", "addTrusted", "greylist(", "blacklist("]
+  for command in commands:
+    if command in event.blip.text:
+     test = True
+  if not test:
+    return
+  if "#!NO" in event.blip.text[:6]:
+    return
+  if "#!NO" in event.blip.text[-6]:
+    return
+  if (event.modified_by in VILLAINS):
+    blip = wavelet.reply("Unfortunately, you are not authorised to use the wavewatchers robot, as you have been blacklisted or greylisted.")
+    blip.append(" See this wave for information on how to get yourself off the blacklist.", bundled_annotations=[("link/wave", 'googlewave.com!w+aSSVnLMbA')])
     return
   logging.info("WaveID = " + wavelet.wave_id)
   logging.info("WaveletID = " + wavelet.wavelet_id)
