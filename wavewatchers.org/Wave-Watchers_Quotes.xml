@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+  <ModulePrefs
+    title="Wave Watchers Quotes"
+    title_url="http://www.WaveWatchers.org"
+    author="Alexandro Jimenez"
+    author_email="alexandrojv@wavewatchers.org"
+    author_affiliation="Wave Watchers"
+    description="Random Wavy Quotes"
+    width="650"
+    height="135"
+    scrolling="false"
+  />
+  <Content type="html"><![CDATA[
+    <style type="text/css">
+      body {
+        background-color: white;
+        text-align:center;
+        font:italic bold 20px Arial;
+      }
+    </style>
+    <body>
+      <div align="center">
+        <br><br>
+        <script language="JavaScript">
+          var Quotation=new Array()
+            Quotation[0] = "One small blip for man, one giant wave for mankind";
+            Quotation[1] = "To wave and beyond!";
+            Quotation[2] = "Every wave is worth protecting";
+            Quotation[3] = "Every wave is worth watching";
+            Quotation[4] = "Approved by Chuck Norris";
+            Quotation[5] = "Trolls and phishers, we got your number";
+            Quotation[6] = "We got wave";
+            Quotation[7] = "Happy surfing, good waves";
+            Quotation[8] = "Because email is so last millenium";
+            Quotation[9] = "Once you go wave you never go back!";
+            Quotation[10] = "Wave you later!";
+            Quotation[11] = "Ask not what your wave can do for you but what you can do for your wave";
+            Quotation[12] = "Once a wave, always a wave!";
+            Quotation[13] = "Will it wave? That is the question";
+          var Q = Quotation.length;
+          var whichQuotation=Math.round(Math.random()*(Q-1));
+          function showQuotation() {
+            document.write("\"" + Quotation[whichQuotation] + "\"");
+          }
+          showQuotation();
+        </script>
+      </div>
+    </body>
+  ]]></Content>
+</Module>
