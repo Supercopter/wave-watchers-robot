@@ -38,6 +38,8 @@
             Quotation[11] = "Ask not what your wave can do for you but what you can do for your wave";
             Quotation[12] = "Once a wave, always a wave!";
             Quotation[13] = "Will it wave? That is the question";
+            Quotation[14] = "Because waves ain't gonna restore themselves";
+            Quotation[15] = "Wavers of the world, unite!";
           var Q = Quotation.length;
           var whichQuotation=Math.round(Math.random()*(Q-1));
           function showQuotation() {
