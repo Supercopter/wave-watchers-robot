@@ -300,7 +300,7 @@ class Image(Element):
   class_type = 'IMAGE'
 
   def __init__(self, url='', width=None, height=None,
-               attachmentId=None, caption=None):
+               attachmentId=None, caption=None, mimeType=None, attachmentUrl=None ):
     super(Image, self).__init__(Image.class_type, url=url, width=width,
           height=height, attachmentId=attachmentId, caption=caption)
 
