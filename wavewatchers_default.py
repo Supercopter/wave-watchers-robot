@@ -360,6 +360,8 @@ def OnBlipSubmitted(event, wavelet):
     logging.info("Blip text = " + event.blip.text)
   else:
     return
+  if len(event.blip.text) <= 4:
+    return
   test = False
   commands = ["makePublic", "addAll", "addOwners", "isSafe", "updateIndex", "displayCommands", "publishWave", "chuckNorris", "addMember", "addOwner", "addRobot", "addTrusted", "greylist(", "blacklist("]
   for command in commands:
