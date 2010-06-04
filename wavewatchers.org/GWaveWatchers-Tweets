@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+  <ModulePrefs
+    title="GWaveWatchers Tweets"
+    title_url="http://www.WaveWatchers.org"
+    author="Alexandro Jimenez"
+    author_email="alexandrojv@wavewatchers.org"
+    author_affiliation="Wave Watchers"
+    description="@GWaveWatchers Twitter Feed"
+    width="650"
+    height="135"
+    scrolling="false"
+  />
+  <Content type="html"><![CDATA[
+    <script src="http://widgets.twimg.com/j/2/widget.js"></script>
+    <script>
+    new TWTR.Widget({
+      version: 2,
+      type: 'profile',
+      rpp: 30,
+      interval: 4000,
+      width: 'auto',
+      height: 300,
+      theme: {
+        shell: {
+          background: '#c8e2fb',
+          color: '#000000'
+        },
+        tweets: {
+          background: '#ffffff',
+          color: '#000000',
+          links: '#bd1839'
+        }
+      },
+      features: {
+        scrollbar: false,
+        loop: true,
+        live: true,
+        hashtags: true,
+        timestamp: true,
+        avatars: false,
+        behavior: 'default'
+      }
+    }).render().setUser('GWaveWatchers').start();
+    </script>
+  ]]></Content>
+</Module>
