@@ -41,6 +41,8 @@
             Quotation[14] = "Because waves ain't gonna restore themselves";
             Quotation[15] = "Wavers of the world, unite!";
             Quotation[16] = "Wave... the Final Frontier";
+            Quotation[17] = "A wave a day keeps the email away";
+            Quotation[18] = "To boldly go where no wave has gone before";
           var Q = Quotation.length;
           var whichQuotation=Math.round(Math.random()*(Q-1));
           function showQuotation() {
