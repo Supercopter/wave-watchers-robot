@@ -49,6 +49,12 @@
             Quotation[22] = "Make wave not war";
             Quotation[23] = "Come and wave it";
             Quotation[24] = "We buzzed you in '10, We shall wave you in '11";
+            Quotation[25] = "Email is so 2001...";
+            Quotation[26] = "There are 2 types of trolls: those that have been defeated and those that will be defeated";
+            Quotation[27] = "Social Networks are so 2008...";
+            Quotation[28] = "If at first you don't succeed-log into Wave!";
+            Quotation[29] = "A journey of a thousand miles begins with the first Wave!";
+            Quotation[30] = "I think there shall be a day when many things are possible in Wave! :)";
           var Q = Quotation.length;
           var whichQuotation=Math.round(Math.random()*(Q-1));
           function showQuotation() {
