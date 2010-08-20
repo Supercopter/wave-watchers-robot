@@ -43,6 +43,12 @@
             Quotation[16] = "Wave... the Final Frontier";
             Quotation[17] = "A wave a day keeps the email away";
             Quotation[18] = "To boldly go where no wave has gone before";
+            Quotation[19] = "Don’t Stop, Keep waving On";
+            Quotation[20] = "Wave unto others as you would have them wave unto you";
+            Quotation[21] = "To wave or not to wave...To Wave!";
+            Quotation[22] = "Make wave not war";
+            Quotation[23] = "Come and wave it";
+            Quotation[24] = "We buzzed you in '10, We shall wave you in '11";
           var Q = Quotation.length;
           var whichQuotation=Math.round(Math.random()*(Q-1));
           function showQuotation() {
