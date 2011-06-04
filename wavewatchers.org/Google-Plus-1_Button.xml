@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+  <ModulePrefs
+    title="Google +1 Button"
+    title_url="http://www.WaveWatchers.org"
+    author="Alexandro Jimenez"
+    author_email="alexandrojv@wavewatchers.org"
+    author_affiliation="Wave Watchers"
+    description="Google +1 Button so visitors can click and share their +1 with everyone."
+    width="50"
+    height="60"
+    scrolling="false"
+  />
+  <Content type="html"><![CDATA[
+    <html>
+      <head>
+        <title>+1 demo: Basic page</title>
+        <link rel="canonical" href="http://www.example.com" />
+        <script type="text/javascript" src="https://apis.google.com/js/plusone.js">
+        </script>
+      </head>
+      <body>
+        <g:plusone size="tall" href="http://www.wavewatchers.org"></g:plusone>
+      </body>
+    </html>
+  ]]></Content>
+</Module>
